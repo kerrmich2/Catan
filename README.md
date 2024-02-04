@@ -9,4 +9,8 @@ To do:
 
 Six player seafarers
 
-![plot](https://github.com/kerrmich2/Catan/blob/main/example%20output/large%20seafarers.png)
+![large seafarers](https://github.com/kerrmich2/Catan/blob/main/example%20output/large%20seafarers.png)
+
+Default
+
+![default catan](![plot](https://github.com/kerrmich2/Catan/blob/main/example%20output/large%20seafarers.png))
