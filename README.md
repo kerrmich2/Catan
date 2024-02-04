@@ -13,4 +13,4 @@ Six player seafarers
 
 Default
 
-![default catan](![plot](https://github.com/kerrmich2/Catan/blob/main/example%20output/large%20seafarers.png))
+![default catan](https://github.com/kerrmich2/Catan/blob/main/example%20output/default-catan.png)
