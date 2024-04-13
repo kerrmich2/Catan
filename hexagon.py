@@ -2,7 +2,7 @@ import matplotlib.patches as mpatches
 
 
 class Hexagon:
-    def __init__(self, geography, number, x, y, fig, ax, vertices=6, radius=0.1):
+    def __init__(self, geography, number, x, y, fig, ax, vertices=6, radius=0.1, is_red_number_eligible=None):
         self.geography = geography
         self.number = number
         self.x = x
@@ -11,6 +11,7 @@ class Hexagon:
         self.radius = radius
         self.ax = ax
         self.fig = fig
+        self.is_red_number_eligible = is_red_number_eligible
 
     def is_red_number(self):
         red_numbers = [6, 8]
@@ -31,10 +32,16 @@ class Hexagon:
                                        color=self.set_color())
 
     def create_border(self):
+
+        if self.geography == "border":
+            border_color = "white"
+        else:
+            border_color = "black"
         return mpatches.RegularPolygon((self.x, self.y),
                                        self.vertices,
                                        radius=self.radius * 1.06,
-                                       color="black")
+                                       color=border_color)
+
 
     def draw_number(self):
         if self.is_red_number():
@@ -52,13 +59,14 @@ class Hexagon:
             "fields": "gold",
             "forests": "darkgreen",
             "gold_fields": "khaki",
-            "desert": "moccasin"
+            "desert": "moccasin",
+            "border": "white"
         }
 
         return geo_to_color[self.geography]
 
     def none_tile(self):
-        none_tiles = ["sea", "desert"]
+        none_tiles = ["sea", "desert", "border"]
         if self.geography in none_tiles:
             return True
         else:
