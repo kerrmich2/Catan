@@ -3,6 +3,7 @@ from math import floor, sqrt
 from hexagon import Hexagon
 import random
 import numpy as np
+import pandas as pd
 
 
 # Throw an exception when the number of rows specified by the user is not odd.
@@ -16,15 +17,23 @@ def dist(coord_1, coord_2):
 
     return sqrt((x_1 - x_2)**2 + (y_1 - y_2)**2)
 
+def create_adj_matrix(hexagons):
+    hex_name_dict = {}
+    for hexagon in hexagons:
+        hex_name_dict[hexagon.name] = hexagon
+    adj_mat = pd.DataFrame(columns=list(hex_name_dict), index=list(hex_name_dict))
+    print(3)
+    return
+
 
 # Get the 6 closest tiles ID (adjacent tiles) per tile 
-def top_6_closest(tiles):
+def top_6_closest(hexagons):
     top_6_closest_tiles_per_subj = []
     k = 6
 
-    for tile_subj_id, tile_subj in enumerate(tiles):
+    for tile_subj_id, tile_subj in enumerate(hexagons):
         dist_list = []
-        for tile_comp_id, tile_comp in enumerate(tiles):
+        for tile_comp_id, tile_comp in enumerate(hexagons):
             if tile_subj_id == tile_comp_id:
                 dist_list.append(float('inf'))
                 continue
@@ -57,6 +66,7 @@ class Map:
         self.numbers = add_n_from_dictionary(seed, numbers)
         self.geographies = add_n_from_dictionary(seed, geographies)
         self.fig, self.ax = plt.subplots()
+        self.RADIUS = 0.1
 
     def is_rows_odd(self):
         """
@@ -75,10 +85,11 @@ class Map:
         tiles = self.geography_tiles(coord_by_row=coords)
         coordinates = [x for xs in coords for x in xs]
         hexagons = self.number_tiles(tiles)
-        self.draw_board(coordinates, hexagons)
         
         # self.is_red_number_eligible(hexagons)
+        create_adj_matrix(hexagons)
         
+        self.draw_board(coordinates, hexagons)
         plt.show()
         return
 
@@ -88,13 +99,13 @@ class Map:
         x-value for the blank sea tile in the Seafarers expansion.
         """
         
-        X_INCREMENT = 0.2
-        Y_INCREMENT = 0.168
-        ROW_START_INCREMENT = 0.1
+        SIZE = 2*self.RADIUS/(3**(1/2))
+        X_INCREMENT = 2*self.RADIUS
+        Y_INCREMENT = 3/2*SIZE
         SWITCH_DIRECTION = floor(self.rows / 2)
         
         hexagons_to_build = self.bases
-        hex_x, hex_y = 0, 0.1
+        hex_x, hex_y = 0, 0
         row_start = 0
         layer_list = []
         
@@ -113,9 +124,9 @@ class Map:
             # When the nth row reaches the pivot row then switch direction and build right with fewer hexagons.
             if row >= SWITCH_DIRECTION:
                 hexagons_to_build -= 1
-                row_start += ROW_START_INCREMENT
+                row_start += self.RADIUS
             else:
-                row_start -= ROW_START_INCREMENT
+                row_start -= self.RADIUS
                 hexagons_to_build += 1
 
             hex_x = row_start
@@ -135,7 +146,7 @@ class Map:
             for coordinate in row:
                 x, y = coordinate[0], coordinate[1]
 
-                tile = Hexagon(None, None, x, y, self.fig, self.ax)
+                hexagon = Hexagon(None, None, x, y, self.fig, self.ax, radius=self.RADIUS)
 
                 left_most_hex = sorted(row, key=lambda t: t[0])[0][0]
                 right_most_hex = sorted(row, reverse=True, key=lambda t: t[0])[0][0]
@@ -143,10 +154,10 @@ class Map:
                 # Check if the tile belongs to the border tiles.
                 if (row_number == 0 or
                         row_number == (self.rows - 1) or
-                        tile.x == left_most_hex or
-                        tile.x == right_most_hex):
-                    tile.geography = "border"
-                    hexagons.append(tile)
+                        hexagon.x == left_most_hex or
+                        hexagon.x == right_most_hex):
+                    hexagon.geography = "border"
+                    hexagons.append(hexagon)
                     continue
 
                 # Add left and right most sea tiles as per the seafarers board.
@@ -155,16 +166,16 @@ class Map:
                     second_left_most_hex = sorted(row, key=lambda t: t[0])[1][0]
                     second_right_most_hex = sorted(row, reverse=True, key=lambda t: t[0])[1][0]
                     if (row_number == floor(self.rows/2) and
-                            (tile.x == second_left_most_hex or tile.x == second_right_most_hex)):
-                        tile.geography = "sea"
-                        hexagons.append(tile)
+                            (hexagon.x == second_left_most_hex or hexagon.x == second_right_most_hex)):
+                        hexagon.geography = "sea"
+                        hexagons.append(hexagon)
                         continue
 
-                tile.geography = self.geographies[iteration]
+                hexagon.geography = self.geographies[iteration]
 
                 iteration += 1
 
-                hexagons.append(tile)
+                hexagons.append(hexagon)
 
         return hexagons
 
@@ -189,12 +200,6 @@ class Map:
         """
         adjacency_mat = top_6_closest(hexagons)
         return adjacency_mat
-
-    def get_nearest_tiles(self):
-        """
-        Return the nearest 6 tiles.
-        """
-        return
 
     def draw_board(self, coords, hexagons):
 

@@ -2,16 +2,56 @@ import matplotlib.patches as mpatches
 
 
 class Hexagon:
-    def __init__(self, geography, number, x, y, fig, ax, vertices=6, radius=0.1, is_red_number_eligible=None):
-        self.geography = geography
-        self.number = number
-        self.x = x
-        self.y = y
+    def __init__(self, geography, number, x, y, fig, ax, radius, vertices=6, is_red_number_eligible=None):
+        self._geography = geography
+        self._number = number
+        self._x = x
+        self._y = y
         self.vertices = vertices
         self.radius = radius
         self.ax = ax
         self.fig = fig
         self.is_red_number_eligible = is_red_number_eligible
+        self._update_name()
+
+    def _update_name(self):
+        self.name = f'{self._geography}_{self._number}_({self._x},{self._y})'
+
+    @property
+    def geography(self):
+        return self._geography
+
+    @geography.setter
+    def geography(self, value):
+        self._geography = value
+        self._update_name()
+
+    @property
+    def number(self):
+        return self._number
+
+    @number.setter
+    def number(self, value):
+        self._number = value
+        self._update_name()
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+        self._update_name()
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, value):
+        self._y = value
+        self._update_name()
 
     def is_red_number(self):
         red_numbers = [6, 8]
@@ -39,7 +79,7 @@ class Hexagon:
             border_color = "black"
         return mpatches.RegularPolygon((self.x, self.y),
                                        self.vertices,
-                                       radius=self.radius * 1.06,
+                                       radius=self.radius,
                                        color=border_color)
 
 
@@ -48,7 +88,7 @@ class Hexagon:
             col = "red"
         else:
             col = "black"
-        self.ax.text(self.x, self.y - 0.025, self.number, ha="center", family='sans-serif', size=20, color=col)
+        self.ax.text(self.x, self.y, self.number, ha="center", family='sans-serif', size=20*self.radius*10, color=col)
 
     def set_color(self):
         geo_to_color = {
